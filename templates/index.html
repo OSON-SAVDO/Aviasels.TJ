@@ -3,115 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aviasales.tj - Маълумоти пурра</title>
+    <title>AviaTJ - Чиптаҳои арзон</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --blue: #007bff; --orange: #ff6d00; --bg: #f2f5f8; }
         body { font-family: sans-serif; background: var(--bg); margin: 0; padding-bottom: 70px; }
+        .header { background: var(--blue); color: white; padding: 20px; text-align: center; border-radius: 0 0 25px 25px; position: relative; }
+        .lang-switch { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); border: none; color: white; padding: 5px 10px; border-radius: 10px; }
         
-        .top-header { background: var(--blue); color: white; padding: 30px 20px 60px; text-align: center; border-radius: 0 0 30px 30px; }
-        .search-container { background: white; margin: -40px 15px 20px; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .search-input-group { background: #f0f3f5; border-radius: 12px; padding: 8px 15px; margin-bottom: 10px; display: flex; align-items: center; }
-        .search-input-group input { border: none; background: transparent; width: 100%; font-size: 16px; outline: none; margin-left: 10px; }
-        .btn-search { width: 100%; background: var(--orange); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
-
-        .ticket-list { padding: 0 15px; }
-        .ticket { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s; border: 1px solid transparent; }
-        .ticket:active { transform: scale(0.98); border-color: var(--blue); }
+        .search-box { background: white; margin: -20px 15px 20px; padding: 15px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .input-group { background: #f0f3f5; border-radius: 12px; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; position: relative; }
+        .input-group input { border: none; background: transparent; width: 100%; outline: none; margin-left: 10px; font-size: 16px; }
         
-        .price { color: var(--blue); font-size: 18px; font-weight: bold; }
-        .btn-buy { background: var(--orange); color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: bold; display: block; text-align: center; margin-top: 10px; }
+        /* Рӯйхати фурудгоҳҳо */
+        .airport-dropdown { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; z-index: 100; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .airport-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .airport-item:hover { background: #f8f9fa; }
 
-        /* Modal (Тирезаи маълумот) */
+        .btn-search { width: 100%; background: var(--orange); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; }
+
+        .ticket { background: white; margin: 10px 15px; padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--blue); }
+        
+        /* Modal */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: flex-end; }
-        .modal-content { background: white; width: 100%; border-radius: 25px 25px 0 0; padding: 25px; box-sizing: border-box; animation: slideUp 0.3s; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        
-        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
-        .info-label { color: #666; font-size: 14px; }
-        .info-value { font-weight: bold; color: #333; }
-        .close-modal { text-align: center; color: var(--blue); font-weight: bold; margin-bottom: 15px; cursor: pointer; }
-
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; }
-        .nav-item { text-align: center; color: #888; text-decoration: none; font-size: 11px; }
-        .active { color: var(--blue); }
+        .modal-content { background: white; width: 100%; border-radius: 25px 25px 0 0; padding: 20px; box-sizing: border-box; }
+        .btn-buy-now { background: var(--orange); color: white; width: 100%; display: block; text-align: center; padding: 15px; border-radius: 12px; text-decoration: none; font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <div class="top-header">
-        <h1>Ҷустуҷӯи чиптаҳо</h1>
+<div class="header">
+    <button class="lang-switch" onclick="toggleLang()">RU/TJ</button>
+    <h1 id="title">Ҷустуҷӯи чипта</h1>
+</div>
+
+<div class="search-box">
+    <div class="input-group">
+        <i class="fa-solid fa-plane-departure"></i>
+        <input type="text" id="fromInput" placeholder="Аз куҷо (DYU)" value="DYU">
     </div>
-
-    <div class="search-container">
-        <form action="/search" method="post">
-            <div class="search-input-group"><i class="fa-solid fa-plane-departure"></i><input type="text" name="from" placeholder="Аз куҷо (Код: DYU)" required></div>
-            <div class="search-input-group"><i class="fa-solid fa-plane-arrival"></i><input type="text" name="to" placeholder="Ба куҷо (Код: MOW)" required></div>
-            <button type="submit" class="btn-search">ҶУСТУҶӮ</button>
-        </form>
-    </div>
-
-    <div class="ticket-list">
-        {% if flights %}
-            {% for f in flights %}
-            <div class="ticket" onclick="showDetails('{{ f.origin }}', '{{ f.destination }}', '{{ f.value }}', '{{ f.depart_date }}', '{{ f.number_of_changes }}', '{{ f.link }}')">
-                <div>
-                    <div style="font-weight: bold;">{{ f.origin }} ➔ {{ f.destination }}</div>
-                    <div style="font-size: 12px; color: #888; margin-top: 5px;"><i class="fa-regular fa-calendar"></i> {{ f.depart_date }}</div>
-                    <div style="font-size: 11px; color: var(--blue);">Пахш кунед барои маълумот</div>
-                </div>
-                <div style="text-align: right;">
-                    <div class="price">{{ f.value }} TJS</div>
-                    <div style="font-size: 10px; color: green;">Арзон</div>
-                </div>
-            </div>
-            {% endfor %}
-        {% endif %}
-    </div>
-
-    <div id="detailsModal" class="modal">
-        <div class="modal-content">
-            <div class="close-modal" onclick="closeModal()">✕ ПӮШИДАН</div>
-            <h2 id="modalTitle" style="margin-top:0;">Душанбе ➔ Москва</h2>
-            
-            <div class="info-row"><span class="info-label">Нарх:</span><span class="info-value" id="modalPrice">0 TJS</span></div>
-            <div class="info-row"><span class="info-label">Санаи парвоз:</span><span class="info-value" id="modalDate">-</span></div>
-            <div class="info-row"><span class="info-label">Трансфер (Пересадка):</span><span class="info-value" id="modalChanges">Прямой рейс</span></div>
-            <div class="info-row"><span class="info-label">Бағоҷ:</span><span class="info-value">23кг (Стандарт)</span></div>
-            <div class="info-row"><span class="info-label">Ручная кладь:</span><span class="info-value">10кг</span></div>
-            <div class="info-row"><span class="info-label">Возврат/Обмен:</span><span class="info-value" style="color: orange;">Тибқи тариф</span></div>
-
-            <a href="#" id="modalBuyBtn" class="btn-buy" target="_blank">ХАРИДАНИ ЧИПТА</a>
+    
+    <div class="input-group">
+        <i class="fa-solid fa-plane-arrival"></i>
+        <input type="text" id="toInput" placeholder="Ба куҷо (Масал: Москва)" oninput="checkMoscow(this.value)">
+        <div id="moscowAirports" class="airport-dropdown">
+            <div class="airport-item" onclick="selectAirport('VKO')">VKO — Внуково</div>
+            <div class="airport-item" onclick="selectAirport('DME')">DME — Домодедово</div>
+            <div class="airport-item" onclick="selectAirport('SVO')">SVO — Шереметьево</div>
+            <div class="airport-item" onclick="selectAirport('ZIA')">ZIA — Жуковский</div>
         </div>
     </div>
+    <button class="btn-search" onclick="performSearch()" id="searchBtn">ҶУСТУҶӮ</button>
+</div>
 
-    <div class="bottom-nav">
-        <a href="/" class="nav-item active"><i class="fa-solid fa-plane"></i><br>Чиптаҳо</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-user"></i><br>Профил</a>
+<div id="results"></div>
+
+<div id="detailModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalRoute"></h3>
+        <p><b id="lblPrice">Нарх:</b> <span id="modalPrice"></span></p>
+        <p><b id="lblType">Намуди рейс:</b> <span id="modalType"></span></p>
+        <p><b id="lblBaggage">Бағоҷ:</b> 23кг (Тибқи тариф)</p>
+        <hr>
+        <a href="#" id="buyLink" class="btn-buy-now">ХАРИДАН (Aviasales)</a>
+        <button onclick="closeModal()" style="width:100%; margin-top:10px; border:none; background:none; color:gray;">Пӯшидан</button>
     </div>
+</div>
 
-    <script>
-        function showDetails(from, to, price, date, changes, link) {
-            document.getElementById('modalTitle').innerText = from + " ➔ " + to;
-            document.getElementById('modalPrice').innerText = price + " TJS";
-            document.getElementById('modalDate').innerText = date;
-            
-            let changeText = (changes == "0" || changes == "") ? "Прямой рейс (Бе пасадка)" : changes + " трансфер";
-            document.getElementById('modalChanges').innerText = changeText;
-            
-            document.getElementById('modalBuyBtn').href = "https://www.aviasales.tj" + link;
-            document.getElementById('detailsModal').style.display = "flex";
-        }
+<script>
+    let currentLang = 'tg';
+    const dict = {
+        tg: { title: "Ҷустуҷӯи чипта", search: "ҶУСТУҶӮ", price: "Нарх", type: "Намуди рейс", buy: "ХАРИДАН", direct: "Прямой рейс (Бе пасадка)", transit: "Бо пасадка (Пересадка)" },
+        ru: { title: "Поиск билетов", search: "ПОИСК", price: "Цена", type: "Тип рейса", buy: "КУПИТЬ", direct: "Прямой рейс", transit: "С пересадкой" }
+    };
 
-        function closeModal() {
-            document.getElementById('detailsModal').style.display = "none";
-        }
+    function toggleLang() {
+        currentLang = currentLang === 'tg' ? 'ru' : 'tg';
+        document.getElementById('title').innerText = dict[currentLang].title;
+        document.getElementById('searchBtn').innerText = dict[currentLang].search;
+        document.getElementById('lblPrice').innerText = dict[currentLang].price;
+        document.getElementById('lblType').innerText = dict[currentLang].type;
+    }
 
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('detailsModal')) {
-                closeModal();
-            }
+    function checkMoscow(val) {
+        const dropdown = document.getElementById('moscowAirports');
+        if(val.toLowerCase().includes('москва') || val.toUpperCase() === 'MOW') {
+            dropdown.style.display = 'block';
+        } else {
+            dropdown.style.display = 'none';
         }
-    </script>
+    }
+
+    function selectAirport(code) {
+        document.getElementById('toInput').value = code;
+        document.getElementById('moscowAirports').style.display = 'none';
+    }
+
+    function performSearch() {
+        const from = document.getElementById('fromInput').value;
+        const to = document.getElementById('toInput').value;
+        
+        fetch('/search', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: `from=${from}&to=${to}&lang=${currentLang}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            let html = '';
+            data.forEach(f => {
+                const type = f.number_of_changes === 0 ? dict[currentLang].direct : dict[currentLang].transit;
+                html += `
+                <div class="ticket" onclick="showDetail('${f.origin}', '${f.destination}', '${f.value}', '${type}', '${f.buy_url}')">
+                    <div>
+                        <b>${f.origin} ➔ ${f.destination}</b><br>
+                        <small>${f.depart_date}</small><br>
+                        <span style="color: ${f.number_of_changes === 0 ? 'green' : 'orange'}">${type}</span>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="color:var(--blue); font-weight:bold">${f.value} TJS</div>
+                        <small>Aviasales</small>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('results').innerHTML = html || '<p style="text-align:center">Натиҷа ёфт нашуд</p>';
+        });
+    }
+
+    function showDetail(from, to, price, type, link) {
+        document.getElementById('modalRoute').innerText = from + " ➔ " + to;
+        document.getElementById('modalPrice').innerText = price + " TJS";
+        document.getElementById('modalType').innerText = type;
+        document.getElementById('buyLink').href = link;
+        document.getElementById('detailModal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('detailModal').style.display = 'none'; }
+</script>
 </body>
 </html>
