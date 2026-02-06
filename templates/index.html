@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviasales.tj - Клон</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --blue: #007bff; --orange: #ff6d00; --bg: #f2f5f8; }
+        body { font-family: sans-serif; background: var(--bg); margin: 0; padding-bottom: 70px; }
+        .top-header { background: var(--blue); color: white; padding: 40px 20px 80px; text-align: center; border-radius: 0 0 30px 30px; }
+        .search-container { background: white; margin: -50px 15px 20px; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .search-input-group { background: #f0f3f5; border-radius: 15px; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; }
+        .search-input-group input { border: none; background: transparent; width: 100%; font-size: 16px; outline: none; padding: 5px; }
+        .ticket-list { padding: 0 15px; }
+        .ticket { background: white; border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .price { color: var(--blue); font-size: 18px; font-weight: bold; }
+        .btn-buy { background: var(--orange); color: white; padding: 8px 15px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: bold; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; }
+        .nav-item { text-align: center; color: #888; text-decoration: none; font-size: 10px; }
+        .nav-item.active { color: var(--blue); }
+    </style>
+</head>
+<body>
+
+    <div class="top-header">
+        <h1>Арзонтарин чиптаҳо</h1>
+    </div>
+
+    <div class="search-container">
+        <form action="/search" method="post">
+            <div class="search-input-group">
+                <i class="fa-solid fa-plane-departure"></i>
+                <input type="text" name="from" placeholder="Аз куҷо" required>
+            </div>
+            <div class="search-input-group">
+                <i class="fa-solid fa-plane-arrival"></i>
+                <input type="text" name="to" placeholder="Ба куҷо" required>
+            </div>
+            <button type="submit" style="width:100%; background: var(--orange); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; cursor:pointer;">ҶУСТУҶӮ</button>
+        </form>
+    </div>
+
+    <div class="ticket-list">
+        <h3 style="margin-left: 5px;">Натиҷаҳо:</h3>
+        {% for f in flights %}
+        <div class="ticket">
+            <div>
+                <div style="font-weight: bold;">{{ f.logo }} {{ f.from_city }} ➔ {{ f.to_city }}</div>
+                <div style="font-size: 12px; color: #666; margin-top: 5px;">Ширкат: {{ f.airline }}</div>
+                <div style="font-size: 12px; color: #666;">Сана: {{ f.date }}</div>
+            </div>
+            <div style="text-align: right;">
+                <div class="price">{{ f.price }} TJS</div>
+                <a href="{{ f.buy_url }}" class="btn-buy" target="_blank">ХАРИДАН</a>
+            </div>
+        </div>
+        {% else %}
+        <p style="text-align: center; color: #888;">Чипта ёфт нашуд.</p>
+        {% endfor %}
+    </div>
+
+    <div class="bottom-nav">
+        <a href="/" class="nav-item active"><i class="fa-solid fa-plane"></i><br>Чиптаҳо</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-heart"></i><br>Интихобшуда</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-user"></i><br>Профил</a>
+    </div>
+
+</body>
+</html>
